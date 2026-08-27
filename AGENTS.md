@@ -117,7 +117,9 @@ If in doubt about which commands to run, ask the user rather than guessing.
 
 ## Git Workflow
 
+- **Trunk**: `main` is the single source of truth. All prior branches (`develop`, `blog`, `features/foundation`) have been merged and deleted.
+- **Branches**: Use short-lived feature branches for new functionality and open a PR back into `main`.
+- **Staging/Production**: The project's core idea uses branches for staging and production (see README). When set up, `staging` and `production` should be created from `main` and only receive merges/promotions.
 - **Commits**: Create atomic, focused commits with clear messages
-- **Branches**: Use feature branches for new functionality
 - **PRs**: Describe changes clearly, link relevant issues
 - **Review**: Ensure all changes build and pass type checks before merging
