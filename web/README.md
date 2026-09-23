@@ -28,3 +28,5 @@ The filename determines the public slug, so renaming a post changes its URL. Mis
 `blog.config.json` supplies the site title, description, author, and base URL. The build worker can replace it before running `pnpm build`.
 
 The home page lists the newest posts, with ten posts per page at `/page/2/` and onward. Each post has a `/posts/<slug>/` page, and tags link to `/tags/<tag>/`. The site includes a custom 404 page. Drafts appear with a DRAFT badge during development and are excluded from production builds. The theme button switches between light and dark mode and saves the choice in local storage; before a choice is made, the site follows the system color scheme.
+
+Published posts also appear in `/rss.xml`. The existing sitemap integration writes `sitemap-index.xml` and includes generated post and tag pages. Run `pnpm test:fixtures` from `web/` to build against `test-fixtures/sample-content/` and check the output, including fallback reporting, RSS, and sitemap routes.

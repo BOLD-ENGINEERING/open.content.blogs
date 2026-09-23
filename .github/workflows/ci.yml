@@ -119,3 +119,38 @@ jobs:
       - name: Test
         if: steps.changes.outputs.worker == 'true'
         run: pytest
+
+  fixtures:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v4
+        id: changes
+        with:
+          base: ${{ github.ref }}
+          filters: |
+            fixtures:
+              - 'web/**'
+              - 'test-fixtures/**'
+              - '.github/workflows/ci.yml'
+      - uses: pnpm/action-setup@v6
+        if: steps.changes.outputs.fixtures == 'true'
+        with:
+          version: 11.7.0
+          standalone: true
+          cache: true
+          cache_dependency_path: web/pnpm-lock.yaml
+          package_json_file: web/package.json
+      - uses: actions/setup-node@v7
+        if: steps.changes.outputs.fixtures == 'true'
+        with:
+          node-version: 22.12.0
+      - name: Install dependencies
+        if: steps.changes.outputs.fixtures == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Build and verify sample content
+        if: steps.changes.outputs.fixtures == 'true'
+        run: pnpm test:fixtures

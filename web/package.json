@@ -12,11 +12,13 @@
     "astro": "astro",
     "check": "astro check",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:fixtures": "node scripts/check-fixture-build.mjs"
   },
   "dependencies": {
     "@astrojs/alpinejs": "^1.0.0",
     "@astrojs/mdx": "^8.0.0",
+    "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
     "@types/alpinejs": "^3.13.11",
     "alpinejs": "^3.17.1",
