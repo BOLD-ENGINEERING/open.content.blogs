@@ -132,3 +132,15 @@ Run Astro commands from `web/`. Relative paths below resolve from `web/`; absolu
 - **Commits**: Create atomic, focused commits with clear messages
 - **PRs**: Describe changes clearly, link relevant issues
 - **Review**: Ensure all changes build and pass type checks before merging
+
+## Constraints (do not violate without asking)
+
+- Node >=22.12.0, pnpm only. Never run `npm` or `yarn`.
+- TypeScript is pinned at 6.0.3. Do NOT upgrade — 7.0.2 breaks `astro check`.
+- `web/` is a static Astro site. Never add an SSR adapter or `output: 'server'`.
+- No React, Vue, Svelte, or Tailwind. Interactivity is Alpine only.
+- User content is plain `.md` only. Never enable MDX for user content — MDX
+  executes JS at build time and user repos are untrusted. MDX is first-party only.
+- `api/` and `worker/` are Python 3.14, each with its own venv.
+- Every change must pass: `pnpm check` (web), `ruff check` + `pytest` (api, worker).
+- Do not add a dependency without justifying it in your response.
