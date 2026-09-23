@@ -1,0 +1,65 @@
+---
+import "../styles/global.css";
+import { blogConfig } from "../utils/blog-config";
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogType?: "website" | "article";
+  noindex?: boolean;
+}
+
+const {
+  title = blogConfig.title,
+  description,
+  ogType = "website",
+  noindex = false,
+} = Astro.props;
+const pageTitle =
+  title === blogConfig.title ? title : `${title} · ${blogConfig.title}`;
+const summary = description || blogConfig.description;
+const canonical = new URL(Astro.url.pathname, blogConfig.baseUrl).href;
+---
+
+<!doctype html>
+<html
+  lang="en"
+  x-data="{ theme: localStorage.getItem('theme') || 'system', toggleTheme() { const current = this.theme === 'system' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : this.theme; this.theme = current === 'dark' ? 'light' : 'dark'; localStorage.setItem('theme', this.theme); document.documentElement.dataset.theme = this.theme; } }"
+  x-init="theme !== 'system' && (document.documentElement.dataset.theme = theme)"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={summary} />
+    <meta name="author" content={blogConfig.author} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={summary} />
+    <meta property="og:url" content={canonical} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="/">
+          {blogConfig.title}
+        </a>
+        <nav class="site-nav" aria-label="Site navigation">
+          <a href="/">Posts</a>
+          <button class="theme-toggle" type="button" x-on:click="toggleTheme()">
+            Toggle theme
+          </button>
+        </nav>
+      </header>
+      <main class="site-main">
+        <slot />
+      </main>
+      <footer class="site-footer">
+        © {new Date().getFullYear()} {blogConfig.author}
+      </footer>
+    </div>
+  </body>
+</html>

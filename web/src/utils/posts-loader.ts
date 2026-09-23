@@ -4,6 +4,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import type { Loader } from "astro/loaders";
 import sanitizeHtml from "sanitize-html";
 import { parseDocument } from "yaml";
+import { slugify } from "./slug";
 
 type ReportItem = {
   file: string;
@@ -18,15 +19,6 @@ type BuildReport = {
   fallbacks: ReportItem[];
   skipped: SkippedItem[];
 };
-
-function slugFromFilename(filename: string): string {
-  return filename
-    .normalize("NFKD")
-    .toLowerCase()
-    .replace(/\p{M}/gu, "")
-    .replace(/[^\p{L}\p{N}]+/gu, "-")
-    .replace(/^-|-$/g, "");
-}
 
 function splitFrontmatter(source: string): {
   data: Record<string, unknown>;
@@ -130,7 +122,7 @@ export function postsLoader(): Loader {
           "/",
         );
         const filename = basename(file, extname(file));
-        const slug = slugFromFilename(filename);
+        const slug = slugify(filename);
         if (!slug) {
           report.skipped.push({
             file: relativeFile,

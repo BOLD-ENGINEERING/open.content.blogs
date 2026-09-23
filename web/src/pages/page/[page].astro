@@ -1,0 +1,43 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Pagination from "../../components/Pagination.astro";
+import PostList from "../../components/PostList.astro";
+import { getVisiblePosts, PAGE_SIZE } from "../../utils/posts";
+import type { Post } from "../../utils/posts";
+
+interface Props {
+  posts: Post[];
+  page: number;
+  totalPages: number;
+}
+
+export async function getStaticPaths() {
+  const posts = await getVisiblePosts();
+  const totalPages = Math.ceil(posts.length / PAGE_SIZE);
+  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => {
+    const page = index + 2;
+    return {
+      params: { page: String(page) },
+      props: {
+        posts: posts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+        page,
+        totalPages,
+      },
+    };
+  });
+}
+
+const { posts, page, totalPages } = Astro.props;
+---
+
+<BaseLayout title={`Posts · Page ${page}`}>
+  <div class="page-heading">
+    <p class="eyebrow">Latest writing</p>
+    <h1>Posts</h1>
+    <p class="page-intro">
+      Page {page} of {totalPages}
+    </p>
+  </div>
+  <PostList posts={posts} />
+  <Pagination {page} {totalPages} />
+</BaseLayout>

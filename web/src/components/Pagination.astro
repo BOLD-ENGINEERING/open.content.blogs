@@ -1,0 +1,25 @@
+---
+import { pageUrl } from "../utils/posts";
+
+interface Props {
+  page: number;
+  totalPages: number;
+}
+
+const { page, totalPages } = Astro.props;
+const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+---
+
+{totalPages > 1 && (
+  <nav class="pagination" aria-label="Post pages">
+    {page > 1 && <a href={pageUrl(page - 1)}>Previous</a>}
+    {pages.map((number) =>
+      number === page ? (
+        <span aria-current="page">{number}</span>
+      ) : (
+        <a href={pageUrl(number)}>{number}</a>
+      ),
+    )}
+    {page < totalPages && <a href={pageUrl(page + 1)}>Next</a>}
+  </nav>
+)}

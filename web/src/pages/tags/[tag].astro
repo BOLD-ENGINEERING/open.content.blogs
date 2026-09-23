@@ -1,0 +1,34 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PostList from "../../components/PostList.astro";
+import {
+  getTagGroups,
+  getVisiblePosts,
+  type TagGroup,
+} from "../../utils/posts";
+
+interface Props {
+  group: TagGroup;
+}
+
+export async function getStaticPaths() {
+  const groups = getTagGroups(await getVisiblePosts());
+  return groups.map((group) => ({
+    params: { tag: group.slug },
+    props: { group },
+  }));
+}
+
+const { group } = Astro.props;
+---
+
+<BaseLayout title={`Posts tagged ${group.name}`}>
+  <div class="page-heading">
+    <p class="eyebrow">Tag archive</p>
+    <h1>{group.name}</h1>
+    <p class="page-intro">
+      {group.posts.length} {group.posts.length === 1 ? "post" : "posts"}
+    </p>
+  </div>
+  <PostList posts={group.posts} />
+</BaseLayout>

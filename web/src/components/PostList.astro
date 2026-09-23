@@ -1,0 +1,49 @@
+---
+import type { Post } from "../utils/posts";
+import { formatDate } from "../utils/posts";
+import { slugify } from "../utils/slug";
+
+interface Props {
+  posts: Post[];
+  emptyMessage?: string;
+}
+
+const { posts, emptyMessage = "No posts published yet." } = Astro.props;
+---
+
+{posts.length === 0 ? (
+  <div class="empty-state">{emptyMessage}</div>
+) : (
+  <ul class="post-list">
+    {posts.map((post) => (
+      <li class="post-card">
+        <article>
+          <div class="post-meta">
+            <time datetime={post.data.date.toISOString()}>
+              {formatDate(post.data.date)}
+            </time>
+            {post.data.draft && <span class="draft-badge">DRAFT</span>}
+          </div>
+          <h2>
+            <a href={`/posts/${encodeURIComponent(post.id)}/`}>
+              {post.data.title}
+            </a>
+          </h2>
+          {post.data.description && <p>{post.data.description}</p>}
+          {post.data.tags.length > 0 && (
+            <ul class="tag-list" aria-label="Tags">
+              {post.data.tags.map((tag) => {
+                const slug = slugify(tag);
+                return slug ? (
+                  <li>
+                    <a href={`/tags/${encodeURIComponent(slug)}/`}>{tag}</a>
+                  </li>
+                ) : null;
+              })}
+            </ul>
+          )}
+        </article>
+      </li>
+    ))}
+  </ul>
+)}

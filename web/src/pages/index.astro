@@ -1,75 +1,18 @@
 ---
-import { getCollection } from "astro:content";
-import Layout from "../layouts/Layout.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Pagination from "../components/Pagination.astro";
+import PostList from "../components/PostList.astro";
+import { getVisiblePosts, PAGE_SIZE } from "../utils/posts";
 
-const posts = (await getCollection("posts"))
-  .filter((post) => !post.data.draft)
-  .sort(
-    (a, b) =>
-      b.data.date.getTime() - a.data.date.getTime() || a.id.localeCompare(b.id),
-  );
+const posts = await getVisiblePosts();
+const totalPages = Math.max(1, Math.ceil(posts.length / PAGE_SIZE));
 ---
 
-<Layout>
-  <h1>Posts</h1>
-  {posts.length === 0 ? (
-    <p>No posts published yet.</p>
-  ) : (
-    <ul class="post-list">
-      {posts.map((post) => (
-        <li>
-          <p class="post-meta">
-            <time datetime={post.data.date.toISOString()}>
-              {post.data.date.toLocaleDateString("en", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                timeZone: "UTC",
-              })}
-            </time>
-          </p>
-          <h2>
-            <a href={`/posts/${encodeURIComponent(post.id)}/`}>
-              {post.data.title}
-            </a>
-          </h2>
-          {post.data.description && <p>{post.data.description}</p>}
-          {post.data.tags.length > 0 && (
-            <p class="post-meta">{post.data.tags.join(" · ")}</p>
-          )}
-        </li>
-      ))}
-    </ul>
-  )}
-</Layout>
-
-<style>
-  h1 {
-    font-size: clamp(2.5rem, 7vw, 4rem);
-    margin: 0 0 1.5rem;
-  }
-  .post-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .post-list li {
-    padding: 1.5rem 0;
-    border-top: 1px solid #d9ded7;
-  }
-  .post-list h2 {
-    margin: 0.35rem 0;
-    font-size: 1.65rem;
-  }
-  .post-list h2 a {
-    color: inherit;
-    text-decoration: none;
-  }
-  .post-list h2 a:hover {
-    color: #1d5b48;
-    text-decoration: underline;
-  }
-  .post-list li > p:last-child {
-    margin-bottom: 0;
-  }
-</style>
+<BaseLayout>
+  <div class="page-heading">
+    <p class="eyebrow">Latest writing</p>
+    <h1>Posts</h1>
+  </div>
+  <PostList posts={posts.slice(0, PAGE_SIZE)} />
+  <Pagination page={1} totalPages={totalPages} />
+</BaseLayout>

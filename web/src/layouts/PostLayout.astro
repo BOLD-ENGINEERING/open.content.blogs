@@ -1,0 +1,52 @@
+---
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "./BaseLayout.astro";
+import { formatDate } from "../utils/posts";
+import { slugify } from "../utils/slug";
+
+interface Props {
+  post: CollectionEntry<"posts">;
+}
+
+const { post } = Astro.props;
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  ogType="article"
+  noindex={post.data.draft}
+>
+  <article class="post-article">
+    <a class="back-link" href="/">
+      ← All posts
+    </a>
+    <header class="post-header">
+      <div class="post-meta">
+        <time datetime={post.data.date.toISOString()}>
+          {formatDate(post.data.date)}
+        </time>
+        {post.data.draft && <span class="draft-badge">DRAFT</span>}
+      </div>
+      <h1>{post.data.title}</h1>
+      {post.data.description && (
+        <p class="post-description">{post.data.description}</p>
+      )}
+      {post.data.tags.length > 0 && (
+        <ul class="tag-list" aria-label="Tags">
+          {post.data.tags.map((tag) => {
+            const slug = slugify(tag);
+            return slug ? (
+              <li>
+                <a href={`/tags/${encodeURIComponent(slug)}/`}>{tag}</a>
+              </li>
+            ) : null;
+          })}
+        </ul>
+      )}
+    </header>
+    <div class="post-body">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
