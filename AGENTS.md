@@ -115,6 +115,15 @@ If in doubt about which commands to run, ask the user rather than guessing.
 - **Dependencies**: Check what libraries are already in use before adding new ones
 - **Async operations**: Handle promises/errors appropriately in both web and api
 
+## Build contract
+
+Run Astro commands from `web/`. Relative paths below resolve from `web/`; absolute paths are also supported.
+
+- `CONTENT_DIR`: Markdown source directory. Defaults to `src/content/posts`.
+- `BLOG_CONFIG`: Site config JSON path. Defaults to `./blog.config.json`.
+- `BUILD_OUT_DIR`: Static output directory. Defaults to `./dist`; `_build-report.json` is written inside it.
+- `SITE_URL`: Astro `site` URL. Defaults to `baseUrl` in the loaded `BLOG_CONFIG` file.
+
 ## Git Workflow
 
 - **Trunk**: `main` is the single source of truth. All prior branches (`develop`, `blog`, `features/foundation`) have been merged and deleted.

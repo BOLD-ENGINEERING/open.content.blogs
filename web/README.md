@@ -23,9 +23,9 @@ tags: [news, updates]
 Post body in Markdown.
 ```
 
-The filename determines the public slug, so renaming a post changes its URL. Missing titles use the filename; missing or invalid dates use the file's modification time. Malformed frontmatter and other invalid fields are handled per file. The build writes fallback and skipped-file details to `dist/_build-report.json`.
+The filename determines the public slug, so renaming a post changes its URL. Missing titles use the filename; missing or invalid dates use the file's modification time. Malformed frontmatter and other invalid fields are handled per file. The build writes fallback and skipped-file details to `_build-report.json` inside the output directory.
 
-`blog.config.json` supplies the site title, description, author, and base URL. The build worker can replace it before running `pnpm build`.
+`blog.config.json` supplies the default site title, description, author, and base URL. A build worker can set `BLOG_CONFIG` to a separate JSON file, `BUILD_OUT_DIR` to a separate output directory, and `SITE_URL` to override Astro's site URL. These paths may be absolute or relative to `web/`.
 
 The home page lists the newest posts, with ten posts per page at `/page/2/` and onward. Each post has a `/posts/<slug>/` page, and tags link to `/tags/<tag>/`. The site includes a custom 404 page. Drafts appear with a DRAFT badge during development and are excluded from production builds. The theme button switches between light and dark mode and saves the choice in local storage; before a choice is made, the site follows the system color scheme.
 

@@ -1,16 +1,22 @@
 import { readFileSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "astro/config";
 import alpinejs from "@astrojs/alpinejs";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 
-const blogConfig = JSON.parse(
-  readFileSync(new URL("./blog.config.json", import.meta.url), "utf8"),
+const projectRoot = dirname(fileURLToPath(import.meta.url));
+const blogConfigPath = resolve(
+  projectRoot,
+  process.env.BLOG_CONFIG || "./blog.config.json",
 );
+const blogConfig = JSON.parse(readFileSync(blogConfigPath, "utf8"));
 
 export default defineConfig({
-  site: blogConfig.baseUrl,
+  site: process.env.SITE_URL || blogConfig.baseUrl,
+  outDir: resolve(projectRoot, process.env.BUILD_OUT_DIR || "./dist"),
   integrations: [
     alpinejs(),
     mdx(),
