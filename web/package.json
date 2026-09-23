@@ -9,7 +9,10 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "check": "astro check",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@astrojs/alpinejs": "^1.0.0",
@@ -17,10 +20,15 @@
     "@astrojs/sitemap": "^3.7.4",
     "@types/alpinejs": "^3.13.11",
     "alpinejs": "^3.17.1",
-    "astro": "^7.2.10"
+    "astro": "^7.2.10",
+    "sanitize-html": "^2.17.7",
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@types/sanitize-html": "^2.16.1",
+    "prettier": "^3.9.8",
+    "prettier-plugin-astro": "^1.0.1",
     "typescript": "^6.0.3"
   }
 }

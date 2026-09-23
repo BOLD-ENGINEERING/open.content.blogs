@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v4
+        id: changes
+        with:
+          base: ${{ github.ref }}
+          filters: |
+            web:
+              - 'web/**'
+      - uses: pnpm/action-setup@v6
+        if: steps.changes.outputs.web == 'true'
+        with:
+          version: 11.7.0
+          standalone: true
+          cache: true
+          cache_dependency_path: web/pnpm-lock.yaml
+          package_json_file: web/package.json
+      - uses: actions/setup-node@v7
+        if: steps.changes.outputs.web == 'true'
+        with:
+          node-version: 22.12.0
+      - name: Install dependencies
+        if: steps.changes.outputs.web == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Check formatting
+        if: steps.changes.outputs.web == 'true'
+        run: pnpm format:check
+      - name: Check types
+        if: steps.changes.outputs.web == 'true'
+        run: pnpm check
+      - name: Build
+        if: steps.changes.outputs.web == 'true'
+        run: pnpm build
+
+  api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v4
+        id: changes
+        with:
+          base: ${{ github.ref }}
+          filters: |
+            api:
+              - 'api/**'
+      - uses: actions/setup-python@v7
+        if: steps.changes.outputs.api == 'true'
+        with:
+          python-version: '3.14'
+          cache: pip
+          cache-dependency-path: |
+            api/requirements.txt
+            api/pyproject.toml
+      - name: Install dependencies
+        if: steps.changes.outputs.api == 'true'
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt --group dev
+      - name: Lint
+        if: steps.changes.outputs.api == 'true'
+        run: ruff check .
+      - name: Check formatting
+        if: steps.changes.outputs.api == 'true'
+        run: ruff format --check .
+      - name: Test
+        if: steps.changes.outputs.api == 'true'
+        run: pytest
+
+  worker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v4
+        id: changes
+        with:
+          base: ${{ github.ref }}
+          filters: |
+            worker:
+              - 'worker/**'
+      - uses: actions/setup-python@v7
+        if: steps.changes.outputs.worker == 'true'
+        with:
+          python-version: '3.14'
+          cache: pip
+          cache-dependency-path: worker/pyproject.toml
+      - name: Install dependencies
+        if: steps.changes.outputs.worker == 'true'
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --group dev
+      - name: Lint
+        if: steps.changes.outputs.worker == 'true'
+        run: ruff check .
+      - name: Check formatting
+        if: steps.changes.outputs.worker == 'true'
+        run: ruff format --check .
+      - name: Test
+        if: steps.changes.outputs.worker == 'true'
+        run: pytest

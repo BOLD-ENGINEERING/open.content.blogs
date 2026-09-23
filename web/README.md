@@ -1,46 +1,28 @@
-# Astro Starter Kit: Basics
+# Content renderer
 
-```sh
-pnpm create astro@latest -- --template basics
+This static Astro site renders Markdown posts from `src/content/posts` by default. Set `CONTENT_DIR` to an absolute path, or to a path relative to `web/`, to use another directory at build time. Markdown files are discovered recursively. Only `.md` files are loaded; `.mdx` files are not treated as user content.
+
+```bash
+pnpm install --frozen-lockfile
+pnpm check
+pnpm build
+CONTENT_DIR=/path/to/posts pnpm build
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Post frontmatter supports `title`, `date`, `description`, `draft`, and `tags`:
 
-## 🚀 Project Structure
+```md
+---
+title: A post
+date: 2026-09-23
+description: A short summary
+draft: false
+tags: [news, updates]
+---
 
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+Post body in Markdown.
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+The filename determines the public slug, so renaming a post changes its URL. Draft posts are loaded but omitted from public pages. Missing titles use the filename; missing or invalid dates use the file's modification time. Malformed frontmatter and other invalid fields are handled per file. The build writes fallback and skipped-file details to `dist/_build-report.json`.
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+`blog.config.json` supplies the site title, description, author, and base URL. The build worker can replace it before running `pnpm build`.
