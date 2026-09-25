@@ -1,31 +1,20 @@
 from __future__ import annotations
 
 import ctypes
+import errno
 import json
 import os
 import re
 import shutil
 import tempfile
 from datetime import UTC, datetime
+from functools import lru_cache
 from pathlib import Path
 
 from worker.build import _lock
 from worker.config import load_settings
 from worker.models import DeployResult
-
-SLUG_PATTERN = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
-
-
-def sanitize_branch(branch: str) -> str:
-    sanitized = re.sub(r"[^a-z0-9-]", "-", branch.lower())
-    return sanitized or "branch"
-
-
-def validate_slug(slug: str) -> None:
-    if len(slug) > 58 or not SLUG_PATTERN.fullmatch(slug):
-        raise ValueError(
-            "slug must be 1-58 lowercase letters, digits or hyphens, without edge hyphens"
-        )
+from worker.naming import sanitize_branch, validate_slug
 
 
 class LocalTarget:
@@ -141,14 +130,66 @@ def _metadata_sha(metadata: dict[str, object]) -> str:
     return sha
 
 
-def _exchange(left: Path, right: Path) -> None:
-    libc = ctypes.CDLL(None, use_errno=True)
-    rename = libc.renameat2
+@lru_cache(maxsize=1)
+def _rename_function():
+    try:
+        rename = ctypes.CDLL(None, use_errno=True).renameat2
+    except AttributeError, OSError:
+        return None
     rename.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint]
     rename.restype = ctypes.c_int
+    return rename
+
+
+def _native_exchange(left: Path, right: Path) -> None:
+    rename = _rename_function()
+    if rename is None:
+        raise OSError(errno.ENOSYS, "renameat2 is unavailable")
     if rename(-100, os.fsencode(left), -100, os.fsencode(right), 2):
         error = ctypes.get_errno()
         raise OSError(error, os.strerror(error))
+
+
+_ACTIVATION_MODES: dict[int, str] = {}
+_UNSUPPORTED = {errno.ENOSYS, errno.EINVAL, errno.ENOTSUP}
+
+
+def activation_mode(directory: Path) -> str:
+    if os.environ.get("OCB_FORCE_RENAME_FALLBACK") == "1":
+        return "rename-fallback"
+    directory.mkdir(parents=True, exist_ok=True)
+    device = directory.stat().st_dev
+    if device not in _ACTIVATION_MODES:
+        with tempfile.TemporaryDirectory(prefix=".activation-probe-", dir=directory) as root:
+            left, right = Path(root) / "left", Path(root) / "right"
+            left.mkdir()
+            right.mkdir()
+            try:
+                _native_exchange(left, right)
+            except OSError as error:
+                if error.errno not in _UNSUPPORTED:
+                    raise
+                _ACTIVATION_MODES[device] = "rename-fallback"
+            else:
+                _ACTIVATION_MODES[device] = "rename-exchange"
+    return _ACTIVATION_MODES[device]
+
+
+def _exchange(left: Path, right: Path) -> None:
+    if activation_mode(right.parent) == "rename-exchange":
+        _native_exchange(left, right)
+        return
+    sha = _metadata_sha(_read_deploy_metadata(right))
+    previous = right.parent / f".previous-{sha}"
+    if previous.exists():
+        raise FileExistsError(f"Unrecovered previous deployment: {previous}")
+    os.rename(right, previous)
+    try:
+        os.rename(left, right)
+    except OSError:
+        os.rename(previous, right)
+        raise
+    os.rename(previous, left)
 
 
 def _read_deploy_metadata(path: Path) -> dict[str, object]:

@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 
 from worker.models import DeployResult
-from worker.targets.local import sanitize_branch
+from worker.naming import sanitize_branch, validate_slug
 
 DEPLOY_TIMEOUT = 300
 URL_PATTERN = re.compile(r"https://[a-zA-Z0-9.-]+(?:/[a-zA-Z0-9._~:/?#\[\]@!$&'()*+,;=%-]*)?")
@@ -48,21 +48,8 @@ class CloudflareTarget:
         if not self.wrangler.is_file():
             raise CloudflareConfigurationError(f"Wrangler is not installed at {self.wrangler}")
 
-    @staticmethod
-    def validate_slug(slug: str) -> None:
-        if (
-            not slug
-            or len(slug) > 58
-            or slug.startswith("-")
-            or slug.endswith("-")
-            or re.fullmatch(r"[a-z0-9-]+", slug) is None
-        ):
-            raise ValueError(
-                "Cloudflare Pages project slugs must be lowercase, 1-58 chars, [a-z0-9-]"
-            )
-
     def site_url(self, slug: str, branch: str) -> str:
-        self.validate_slug(slug)
+        validate_slug(slug)
         branch_name = sanitize_branch(branch)
         host = f"{slug}.pages.dev" if branch_name == "main" else f"{branch_name}.{slug}.pages.dev"
         return f"https://{host}"
@@ -83,7 +70,8 @@ class CloudflareTarget:
         return output.replace(self.token, "[REDACTED]").replace(self.account_id, "[REDACTED]")
 
     def deploy(self, dist_dir: str, slug: str, branch: str, sha: str) -> DeployResult:
-        self.validate_slug(slug)
+        validate_slug(slug)
+        sanitize_branch(branch)
         log_path = Path(dist_dir).parent / "deploy.log"
         log_path.parent.mkdir(parents=True, exist_ok=True)
         lines: list[str] = []
