@@ -1,0 +1,20 @@
+110:+local Git/Astro/HTTP/Chromium pipeline. Do not weaken or skip failing assertions.
+1794:+    assert report["loaded"] == 8 and report["skipped"] == []
+1831:+    assert {row["path"]: row["reason"] for row in manifest["skipped"]} == {
+2182:+        json.dumps({"sha": "a" * 40, "files": ["a.md"], "skipped": []})
+2409:+    assert error.value.manifest.skipped
+2720:+        skipped=data.get("skipped", []),
+3291:+    skipped: list[dict[str, str]] = field(default_factory=list)
+3728:+                    manifest.skipped.append(
+3737:+                    manifest.skipped.append(
+3745:+                    manifest.skipped.append(
+3758:+                    manifest.skipped.append({"path": relative_path, "reason": "unreadable entry"})
+3761:+                    manifest.skipped.append(
+3766:+                    manifest.skipped.append({"path": relative_path, "reason": "not a regular file"})
+3770:+                    manifest.skipped.append(
+3775:+                    manifest.skipped.append({"path": relative_path, "reason": "hidden path"})
+3778:+                    manifest.skipped.append({"path": relative_path, "reason": "mdx not permitted"})
+3781:+                    manifest.skipped.append(
+3786:+                    manifest.skipped.append(
+3794:+                    manifest.skipped.append(
+3801:+                    manifest.skipped.append(

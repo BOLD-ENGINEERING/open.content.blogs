@@ -1,0 +1,29 @@
+$ astro build
+14:10:42 [content] Syncing content
+14:10:42 [content] Synced content
+14:10:42 [types] Generated 440ms
+14:10:42 [build] output: "static"
+14:10:42 [build] mode: "static"
+14:10:42 [build] directory: /home/puppet-master/Projects/open.content.blogs/web/dist/
+14:10:42 [build] Collecting build info...
+14:10:42 [build] ✓ Completed in 472ms.
+14:10:42 [build] Building static entrypoints...
+14:10:42 [vite] ✓ built in 233ms
+14:10:42 [vite] ✓ built in 40ms
+14:10:42 [build] Rearranging server assets...
+
+ generating static routes 
+The collection "posts" does not exist or is empty. Please check your content config file for errors.
+The collection "posts" does not exist or is empty. Please check your content config file for errors.
+The collection "posts" does not exist or is empty. Please check your content config file for errors.
+14:10:42   ├─ /404.html (+25ms) 
+14:10:42   ├─ /rss.xmlThe collection "posts" does not exist or is empty. Please check your content config file for errors.
+ (+23ms) 
+14:10:42   ├─ /index.htmlThe collection "posts" does not exist or is empty. Please check your content config file for errors.
+ (+2ms) 
+14:10:42 ✓ Completed in 75ms.
+
+14:10:42 [build] ✓ Completed in 393ms.
+14:10:42 [@astrojs/sitemap] `sitemap-index.xml` created at `dist`
+14:10:42 [build] 2 page(s) built in 877ms
+14:10:42 [build] Complete!

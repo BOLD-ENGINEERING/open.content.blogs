@@ -1,0 +1,27 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0 -- /tmp/ocb-fresh-final/worker/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /tmp/ocb-fresh-final/worker
+configfile: pyproject.toml
+testpaths: tests
+collecting ... collected 54 items / 37 deselected / 17 selected
+
+tests/e2e/test_pipeline.py::test_s1_happy PASSED                         [  5%]
+tests/e2e/test_pipeline.py::test_s2_promotion PASSED                     [ 11%]
+tests/e2e/test_pipeline.py::test_s3_edges PASSED                         [ 17%]
+tests/e2e/test_pipeline.py::test_s4_hostile PASSED                       [ 23%]
+tests/e2e/test_pipeline.py::test_s4b_oversize PASSED                     [ 29%]
+tests/e2e/test_pipeline.py::test_s5_subdir PASSED                        [ 35%]
+tests/e2e/test_pipeline.py::test_s6_removal PASSED                       [ 41%]
+tests/e2e/test_pipeline.py::test_s7_dates PASSED                         [ 47%]
+tests/e2e/test_pipeline.py::test_s8_refs PASSED                          [ 52%]
+tests/e2e/test_pipeline.py::test_s9_rollback PASSED                      [ 58%]
+tests/e2e/test_pipeline.py::test_s10_concurrency PASSED                  [ 64%]
+tests/e2e/test_pipeline.py::test_s11_timeout PASSED                      [ 70%]
+tests/e2e/test_pipeline.py::test_s12_determinism PASSED                  [ 76%]
+tests/e2e/test_visual.py::test_visual[1440-900-light] PASSED             [ 82%]
+tests/e2e/test_visual.py::test_visual[1440-900-dark] PASSED              [ 88%]
+tests/e2e/test_visual.py::test_visual[390-844-light] PASSED              [ 94%]
+tests/e2e/test_visual.py::test_visual[390-844-dark] PASSED               [100%]
+
+================ 17 passed, 37 deselected in 278.31s (0:04:38) =================

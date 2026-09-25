@@ -1,0 +1,3 @@
+Fresh-clone serve: HTTP 200, 10 posts on page 1, Cache-Control no-store
+Fresh-clone listing: HTTP 200, fresh-demo/main present
+SIGINT: clean exit 0

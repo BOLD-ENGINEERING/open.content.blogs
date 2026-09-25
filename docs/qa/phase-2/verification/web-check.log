@@ -1,0 +1,13 @@
+$ astro check
+14:10:36 [vite] Re-optimizing dependencies because vite config has changed
+14:10:36 [content] Syncing content
+14:10:36 [content] Astro config changed
+14:10:36 [content] Clearing content store
+14:10:36 [content] Synced content
+14:10:36 [types] Generated 498ms
+14:10:36 [check] Getting diagnostics for Astro files in /home/puppet-master/Projects/open.content.blogs/web...
+Result (18 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+

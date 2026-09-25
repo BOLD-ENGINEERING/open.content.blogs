@@ -1,0 +1,4 @@
+open.content.blogs: git status --porcelain web/ -> empty
+ocb-fresh-final: git status --porcelain web/ -> empty
+Live owned Node/pnpm/Chromium processes: 0
+Screenshot inventory: 36/36 exact expected filenames
