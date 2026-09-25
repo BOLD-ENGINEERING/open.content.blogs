@@ -135,6 +135,7 @@ def run_build(request: BuildRequest, content_dir: Path, site_url: str) -> BuildR
         "CONTENT_DIR": str(content_dir.resolve()),
         "BLOG_CONFIG": str(config_path.resolve()),
         "BUILD_OUT_DIR": str(dist_dir.resolve()),
+        "BUILD_CACHE_DIR": str((build_dir / ".astro").resolve()),
         "SITE_URL": site_url,
     }
 
@@ -142,31 +143,30 @@ def run_build(request: BuildRequest, content_dir: Path, site_url: str) -> BuildR
         pass
     _ensure_node_dependencies(settings.template_dir, log_path, env)
     command = ["pnpm", "build"]
-    with _lock(_template_lock(settings.template_dir, "build")):
-        with log_path.open("a", encoding="utf8", buffering=1) as log:
-            log.write("$ pnpm build\n")
-            process = subprocess.Popen(
-                command,
-                cwd=settings.template_dir,
-                env=env,
-                stdout=log,
-                stderr=subprocess.STDOUT,
-                start_new_session=True,
+    with log_path.open("a", encoding="utf8", buffering=1) as log:
+        log.write("$ pnpm build\n")
+        process = subprocess.Popen(
+            command,
+            cwd=settings.template_dir,
+            env=env,
+            stdout=log,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+        )
+        try:
+            return_code = process.wait(timeout=settings.build_timeout)
+        except subprocess.TimeoutExpired:
+            _terminate_group(process)
+            return BuildResult(
+                status="timeout",
+                sha=sha,
+                dist_dir=str(dist_dir),
+                log_path=str(log_path),
+                report=None,
+                manifest=manifest,
+                duration_seconds=round(time.monotonic() - started, 3),
+                error=f"Astro build exceeded BUILD_TIMEOUT={settings.build_timeout} seconds",
             )
-            try:
-                return_code = process.wait(timeout=settings.build_timeout)
-            except subprocess.TimeoutExpired:
-                _terminate_group(process)
-                return BuildResult(
-                    status="timeout",
-                    sha=sha,
-                    dist_dir=str(dist_dir),
-                    log_path=str(log_path),
-                    report=None,
-                    manifest=manifest,
-                    duration_seconds=round(time.monotonic() - started, 3),
-                    error=f"Astro build exceeded BUILD_TIMEOUT={settings.build_timeout} seconds",
-                )
 
     if return_code:
         return BuildResult(

@@ -61,6 +61,7 @@ try {
       CONTENT_DIR: fixtureRoot,
       BLOG_CONFIG: configPath,
       BUILD_OUT_DIR: distRoot,
+      BUILD_CACHE_DIR: join(tempRoot, ".astro"),
       SITE_URL: siteUrl,
     },
     stdio: "inherit",

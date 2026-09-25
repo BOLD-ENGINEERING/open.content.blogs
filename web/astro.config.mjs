@@ -17,7 +17,14 @@ const blogConfig = JSON.parse(readFileSync(blogConfigPath, "utf8"));
 export default defineConfig({
   site: process.env.SITE_URL || blogConfig.baseUrl,
   outDir: resolve(projectRoot, process.env.BUILD_OUT_DIR || "./dist"),
-  build: { inlineStylesheets: "always" },
+  cacheDir: resolve(projectRoot, process.env.BUILD_CACHE_DIR || "./.astro"),
+  vite: {
+    cacheDir: resolve(
+      projectRoot,
+      process.env.BUILD_CACHE_DIR || "./.astro",
+      "vite",
+    ),
+  },
   integrations: [
     alpinejs(),
     mdx(),
@@ -27,7 +34,11 @@ export default defineConfig({
       hooks: {
         "astro:build:done": async ({ dir }) => {
           const report = await readFile(
-            new URL("./.astro/_build-report.json", import.meta.url),
+            resolve(
+              projectRoot,
+              process.env.BUILD_CACHE_DIR || "./.astro",
+              "_build-report.json",
+            ),
           );
           await writeFile(new URL("_build-report.json", dir), report);
         },

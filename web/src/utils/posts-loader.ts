@@ -269,7 +269,11 @@ export function postsLoader(): Loader {
         }
       }
 
-      const reportPath = join(projectRoot, ".astro", "_build-report.json");
+      const reportPath = resolve(
+        projectRoot,
+        process.env.BUILD_CACHE_DIR || "./.astro",
+        "_build-report.json",
+      );
       await fs.mkdir(dirname(reportPath), { recursive: true });
       await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
       if (report.fallbacks.length || report.skipped.length) {
