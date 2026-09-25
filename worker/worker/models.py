@@ -49,3 +49,16 @@ class DeployResult:
     alias_url: str | None
     log_path: str
     error: str | None = None
+
+
+@dataclass
+class PipelineResult:
+    status: BuildStatus = "failed"
+    stages: list[dict[str, Any]] = field(default_factory=list)
+    build: BuildResult | None = None
+    deploy: DeployResult | None = None
+    manifest: ContentManifest | None = None
+    alias_url: str | None = None
+    error: str | None = None
+    site_url: str | None = None
+    log_paths: list[str] = field(default_factory=list)

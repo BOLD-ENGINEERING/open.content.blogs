@@ -14,14 +14,15 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
-from worker.build import BuildConfigurationError, run_build
+from worker.build import BuildConfigurationError
 from worker.config import Settings, load_settings
-from worker.models import BuildRequest, BuildResult
+from worker.models import BuildRequest
+from worker.naming import validate_slug
+from worker.pipeline import run_pipeline
 from worker.serve import serve
-from worker.source import SourceError, fetch_content
 from worker.targets.base import DeployTarget
 from worker.targets.cloudflare import CloudflareTarget
-from worker.targets.local import LocalTarget
+from worker.targets.local import LocalTarget, activation_mode
 
 logger = logging.getLogger("worker")
 
@@ -55,14 +56,12 @@ def _tail(path: str | None, error: str | None) -> str:
     return error or "The operation failed without a log."
 
 
-def _mark_finished(build_id: str) -> None:
-    settings = load_settings()
-    build_dir = settings.build_root / build_id
-    if build_dir.is_dir():
-        (build_dir / ".finished").touch()
-
-
 def _build(args: argparse.Namespace) -> int:
+    try:
+        validate_slug(args.slug)
+    except ValueError as error:
+        print(str(error), file=sys.stderr)
+        return 1
     settings = load_settings()
     template_config = settings.template_dir / "blog.config.json"
     try:
@@ -86,123 +85,24 @@ def _build(args: argparse.Namespace) -> int:
         site_config=site_config,
         target=args.target,
     )
+
+    def event(row: dict[str, Any]) -> None:
+        if not args.json and row["ended_at"] is not None:
+            print(f"{row['name']} {row['status']} ({row['duration_seconds']:.3f}s)")
+
     try:
-        target = _target(args.target)
-        site_url = target.site_url(request.slug, request.ref)
-    except (ValueError, RuntimeError, OSError) as error:
+        result = run_pipeline(request, _target(args.target), event)
+    except (BuildConfigurationError, RuntimeError, OSError, ValueError) as error:
         print(str(error), file=sys.stderr)
         return 1
-
-    logging.debug("Fetching content for %s at ref %s", request.slug, request.ref)
-    fetch_started = time.monotonic()
-    try:
-        content_dir, manifest = fetch_content(request)
-    except SourceError as error:
-        duration = round(time.monotonic() - fetch_started, 3)
-        build_result = BuildResult(
-            status="failed",
-            sha=error.manifest.sha if error.manifest else None,
-            dist_dir=None,
-            log_path="",
-            report=None,
-            manifest=error.manifest,
-            duration_seconds=duration,
-            error=str(error),
-        )
-        if args.json:
-            _print_json(
-                {
-                    "site_url": site_url,
-                    "fetch_duration_seconds": duration,
-                    "build": asdict(build_result),
-                    "deploy": None,
-                }
-            )
-        else:
-            print(f"fetch failed ({duration:.3f}s)", file=sys.stderr)
-            print(_tail(None, str(error)), file=sys.stderr)
-        return 1
-    fetch_duration = round(time.monotonic() - fetch_started, 3)
-    if not args.json:
-        print(f"fetch success ({fetch_duration:.3f}s, {manifest.sha})")
-
-    logging.debug("Building %s from %s", request.slug, manifest.sha)
-    try:
-        build_result = run_build(request, content_dir, site_url)
-    except (BuildConfigurationError, OSError, ValueError) as error:
-        _mark_finished(str(request.build_id))
-        if args.json:
-            _print_json(
-                {
-                    "site_url": site_url,
-                    "fetch_duration_seconds": fetch_duration,
-                    "manifest": asdict(manifest),
-                    "build": {
-                        "status": "failed",
-                        "sha": manifest.sha,
-                        "dist_dir": None,
-                        "log_path": str(settings.build_root / str(request.build_id) / "build.log"),
-                        "report": None,
-                        "manifest": asdict(manifest),
-                        "duration_seconds": 0,
-                        "error": str(error),
-                    },
-                    "deploy": None,
-                }
-            )
-        else:
-            print("build failed", file=sys.stderr)
-            print(
-                _tail(str(settings.build_root / str(request.build_id) / "build.log"), str(error)),
-                file=sys.stderr,
-            )
-        return 1
-
-    if build_result.status != "success" or not build_result.dist_dir or not build_result.sha:
-        _mark_finished(str(request.build_id))
-        if args.json:
-            _print_json(
-                {
-                    "site_url": site_url,
-                    "fetch_duration_seconds": fetch_duration,
-                    "build": asdict(build_result),
-                    "deploy": None,
-                }
-            )
-        else:
-            print(
-                f"build {build_result.status} ({build_result.duration_seconds:.3f}s)",
-                file=sys.stderr,
-            )
-            print(build_result.error, file=sys.stderr)
-            print(_tail(build_result.log_path, build_result.error), file=sys.stderr)
-        return 1
-
-    if not args.json:
-        print(f"build success ({build_result.duration_seconds:.3f}s)")
-    deploy_started = time.monotonic()
-    deploy_result = target.deploy(
-        build_result.dist_dir, request.slug, request.ref, build_result.sha
-    )
-    deploy_duration = round(time.monotonic() - deploy_started, 3)
-    _mark_finished(str(request.build_id))
     if args.json:
-        _print_json(
-            {
-                "site_url": site_url,
-                "fetch_duration_seconds": fetch_duration,
-                "build": asdict(build_result),
-                "deploy": asdict(deploy_result),
-                "deploy_duration_seconds": deploy_duration,
-            }
-        )
+        _print_json(asdict(result))
+    elif result.status == "success":
+        print(result.alias_url)
     else:
-        print(f"deploy {deploy_result.status} ({deploy_duration:.3f}s)")
-        if deploy_result.status == "success" and deploy_result.alias_url:
-            print(deploy_result.alias_url)
-        else:
-            print(_tail(deploy_result.log_path, deploy_result.error), file=sys.stderr)
-    return 0 if deploy_result.status == "success" else 1
+        failed = result.deploy or result.build
+        print(_tail(failed.log_path if failed else None, result.error), file=sys.stderr)
+    return 0 if result.status == "success" else 1
 
 
 def _version(command: str) -> str | None:
@@ -237,6 +137,7 @@ def _writable_directory(path: Path) -> bool:
 
 def _doctor(settings: Settings) -> int:
     checks: list[tuple[str, bool, str]] = []
+    print(f"Activation mode: {activation_mode(settings.serve_root)}")
     git = _version("git")
     checks.append(("git", git is not None, git or "MISSING"))
     node = _version("node")
