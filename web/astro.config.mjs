@@ -17,6 +17,7 @@ const blogConfig = JSON.parse(readFileSync(blogConfigPath, "utf8"));
 export default defineConfig({
   site: process.env.SITE_URL || blogConfig.baseUrl,
   outDir: resolve(projectRoot, process.env.BUILD_OUT_DIR || "./dist"),
+  build: { inlineStylesheets: "always" },
   integrations: [
     alpinejs(),
     mdx(),
