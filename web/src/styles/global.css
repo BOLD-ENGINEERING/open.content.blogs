@@ -79,7 +79,7 @@ button {
 }
 
 .site-shell {
-  width: min(calc(100% - 2rem), 70rem);
+  width: min(calc(100% - 2rem), var(--prose-width));
   margin: 0 auto;
 }
 .site-header {
