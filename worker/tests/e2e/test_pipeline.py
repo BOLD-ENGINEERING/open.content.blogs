@@ -15,6 +15,8 @@ from xml.etree import ElementTree
 import pytest
 from conftest import ROOT, command, post, snapshot
 
+from tests.concurrency import assert_wall_time_budget
+
 pytestmark = pytest.mark.e2e
 
 
@@ -358,7 +360,7 @@ def test_s10_concurrency(harness, browser):
     assert max(datetime.fromisoformat(row["started_at"]) for row in intervals) < min(
         datetime.fromisoformat(row["ended_at"]) for row in intervals
     )
-    assert wall < 2 * statistics.median(singles)
+    assert_wall_time_budget(wall, statistics.median(singles))
     assert len({data["build"]["dist_dir"] for data in results}) == 3
     for n, data in enumerate(results):
         assert published(harness, data) == {f"/posts/only-{n}/"}
