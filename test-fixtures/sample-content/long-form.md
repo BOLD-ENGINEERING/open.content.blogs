@@ -3,7 +3,14 @@ title: Long form example
 date: 2026-01-05
 ---
 
-A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words.
+## A readable introduction
+
+### A practical example
+
+```python
+message = "A deliberately long code example checks scrolling within the code block on a narrow mobile screen."
+print(message)
+```
 
 A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words.
 
@@ -62,3 +69,5 @@ A long post tests rendering with repeated readable fixture words. A long post te
 A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words.
 
 A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words.
+
+A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A long post tests rendering with repeated readable fixture words. A

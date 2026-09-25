@@ -18,7 +18,8 @@ const {
 const pageTitle =
   title === blogConfig.title ? title : `${title} · ${blogConfig.title}`;
 const summary = description || blogConfig.description;
-const canonical = new URL(Astro.url.pathname, blogConfig.baseUrl).href;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? blogConfig.baseUrl)
+  .href;
 ---
 
 <!doctype html>
