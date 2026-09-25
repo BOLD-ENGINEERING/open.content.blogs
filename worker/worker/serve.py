@@ -158,9 +158,7 @@ class LocalSiteHandler(BaseHTTPRequestHandler):
         content_type, encoding = mimetypes.guess_type(path.name)
         if not content_type:
             content_type = "application/octet-stream"
-        if encoding:
-            content_type = f"{content_type}; encoding={encoding}"
-        elif content_type.startswith("text/") or content_type in {
+        if content_type.startswith("text/") or content_type in {
             "application/javascript",
             "application/json",
             "application/xml",
@@ -172,12 +170,21 @@ class LocalSiteHandler(BaseHTTPRequestHandler):
         except OSError:
             self._send_bytes(404, b"Not Found\n", "text/plain; charset=utf-8", head_only)
             return
-        self._send_bytes(status, data, content_type, head_only)
+        self._send_bytes(status, data, content_type, head_only, encoding=encoding)
 
-    def _send_bytes(self, status: int, data: bytes, content_type: str, head_only: bool) -> None:
+    def _send_bytes(
+        self,
+        status: int,
+        data: bytes,
+        content_type: str,
+        head_only: bool,
+        encoding: str | None = None,
+    ) -> None:
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(data)))
+        if encoding:
+            self.send_header("Content-Encoding", encoding)
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
         if not head_only:

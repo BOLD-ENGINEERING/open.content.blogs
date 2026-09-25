@@ -36,7 +36,9 @@ def repository(tmp_path, monkeypatch):
 
     git("init", "--initial-branch=main")
 
-    def commit():
+    def commit(date=None):
+        if date:
+            env.update(GIT_AUTHOR_DATE=date, GIT_COMMITTER_DATE=date)
         git("add", "--all")
         git("commit", "--allow-empty", "-m", "fixture")
 
@@ -48,7 +50,7 @@ def test_history_unicode_rename_and_single_log(repository, monkeypatch):
     (root / "café\tname.md").write_text("undated")
     commit()
     git("mv", "café\tname.md", "renamed.md")
-    commit()
+    commit("2024-01-01T12:00:00Z")
     calls = []
     from worker import source
 

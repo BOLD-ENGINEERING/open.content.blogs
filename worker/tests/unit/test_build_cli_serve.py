@@ -135,7 +135,7 @@ def test_http_routes_mime_404_and_traversal(tmp_path):
     handler.serve_root = tmp_path
     handler.headers = {"Host": "blog.localhost:8787"}
     result = []
-    handler._send_bytes = lambda *args: result.append(args)
+    handler._send_bytes = lambda *args, **kwargs: result.append(args)
     for path, status, body in [
         ("/", 200, b"INDEX"),
         ("/missing", 404, b"BRANDED 404"),
