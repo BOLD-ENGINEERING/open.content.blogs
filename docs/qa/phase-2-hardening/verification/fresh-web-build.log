@@ -1,0 +1,30 @@
+$ node scripts/build.mjs
+15:13:19 [vite] Re-optimizing dependencies because vite config has changed
+15:13:20 [content] Syncing content
+15:13:20 [content] Synced content
+15:13:20 [types] Generated 579ms
+15:13:20 [build] output: "static"
+15:13:20 [build] mode: "static"
+15:13:20 [build] directory: /tmp/ocb-hardening-fresh-final/web/dist/
+15:13:20 [build] Collecting build info...
+15:13:20 [build] ✓ Completed in 605ms.
+15:13:20 [build] Building static entrypoints...
+15:13:20 [vite] ✓ built in 366ms
+15:13:20 [vite] ✓ built in 56ms
+15:13:20 [build] Rearranging server assets...
+
+ generating static routes
+The collection "posts" does not exist or is empty. Please check your content config file for errors.
+The collection "posts" does not exist or is empty. Please check your content config file for errors.
+The collection "posts" does not exist or is empty. Please check your content config file for errors.
+15:13:20   ├─ /404.html (+20ms)
+15:13:20   ├─ /rss.xmlThe collection "posts" does not exist or is empty. Please check your content config file for errors.
+ (+44ms)
+15:13:20   ├─ /index.htmlThe collection "posts" does not exist or is empty. Please check your content config file for errors.
+ (+15ms)
+15:13:20 ✓ Completed in 116ms.
+
+15:13:20 [build] ✓ Completed in 583ms.
+15:13:20 [@astrojs/sitemap] `sitemap-index.xml` created at `../../dist`
+15:13:20 [build] 2 page(s) built in 1.21s
+15:13:20 [build] Complete!

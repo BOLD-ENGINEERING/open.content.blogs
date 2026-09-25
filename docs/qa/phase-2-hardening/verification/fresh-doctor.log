@@ -1,0 +1,12 @@
+Activation mode: rename-exchange
+CLOUDFLARE_API_TOKEN: MISSING
+CLOUDFLARE_ACCOUNT_ID: MISSING
+OK git: git version 2.55.0
+OK node >=22.12: v26.7.0
+OK pnpm: 11.7.0
+OK wrangler: 4.140.0
+OK TEMPLATE_DIR: /tmp/ocb-hardening-fresh-final/web
+OK template node_modules: present
+OK BUILD_ROOT: /tmp/ocb-hardening-fresh-final-doctor/build (writable)
+OK SERVE_ROOT: /tmp/ocb-hardening-fresh-final-doctor/serve (writable)
+OK Playwright Chromium: /usr/bin/chromium

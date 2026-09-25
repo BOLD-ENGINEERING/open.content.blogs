@@ -1,0 +1,9 @@
+$ astro check
+14:59:29 [content] Syncing content
+14:59:29 [content] Synced content
+14:59:29 [types] Generated 461ms
+14:59:29 [check] Getting diagnostics for Astro files in /home/puppet-master/Projects/open.content.blogs/web...
+Result (19 files):
+- 0 errors
+- 0 warnings
+- 0 hints

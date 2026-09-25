@@ -1,0 +1,30 @@
+$ node scripts/build.mjs
+14:59:35 [vite] Re-optimizing dependencies because vite config has changed
+14:59:36 [content] Syncing content
+14:59:36 [content] Synced content
+14:59:36 [types] Generated 542ms
+14:59:36 [build] output: "static"
+14:59:36 [build] mode: "static"
+14:59:36 [build] directory: /home/puppet-master/Projects/open.content.blogs/web/dist/
+14:59:36 [build] Collecting build info...
+14:59:36 [build] ✓ Completed in 567ms.
+14:59:36 [build] Building static entrypoints...
+14:59:36 [vite] ✓ built in 244ms
+14:59:36 [vite] ✓ built in 43ms
+14:59:36 [build] Rearranging server assets...
+
+ generating static routes
+The collection "posts" does not exist or is empty. Please check your content config file for errors.
+The collection "posts" does not exist or is empty. Please check your content config file for errors.
+The collection "posts" does not exist or is empty. Please check your content config file for errors.
+14:59:36   ├─ /404.html (+14ms)
+14:59:36   ├─ /rss.xmlThe collection "posts" does not exist or is empty. Please check your content config file for errors.
+ (+33ms)
+14:59:36   ├─ /index.htmlThe collection "posts" does not exist or is empty. Please check your content config file for errors.
+ (+2ms)
+14:59:36 ✓ Completed in 79ms.
+
+14:59:36 [build] ✓ Completed in 406ms.
+14:59:36 [@astrojs/sitemap] `sitemap-index.xml` created at `../../dist`
+14:59:36 [build] 2 page(s) built in 985ms
+14:59:36 [build] Complete!

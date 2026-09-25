@@ -1,0 +1,11 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0 -- /home/puppet-master/Projects/open.content.blogs/worker/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/puppet-master/Projects/open.content.blogs/worker
+configfile: pyproject.toml
+testpaths: tests
+collecting ... collected 88 items / 87 deselected / 1 selected
+
+tests/e2e/test_pipeline.py::test_s10_concurrency PASSED                  [100%]
+
+====================== 1 passed, 87 deselected in 21.75s =======================

@@ -1,0 +1,14 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0
+rootdir: /tmp/ocb-hardening-fresh-final/worker
+configfile: pyproject.toml
+testpaths: tests
+collected 88 items / 18 deselected / 70 selected
+
+tests/unit/test_build_cli_serve.py .........                             [ 12%]
+tests/unit/test_naming_activation.py ........................            [ 47%]
+tests/unit/test_pipeline_runner.py .........                             [ 60%]
+tests/unit/test_source.py ..........                                     [ 74%]
+tests/unit/test_targets.py ..................                            [100%]
+
+====================== 70 passed, 18 deselected in 1.32s =======================

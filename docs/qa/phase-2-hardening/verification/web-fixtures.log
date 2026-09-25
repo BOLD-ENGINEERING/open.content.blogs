@@ -1,0 +1,78 @@
+$ node scripts/check-fixture-build.mjs
+$ node scripts/build.mjs
+14:59:38 [content] Syncing content
+14:59:39 [WARN] [resilient-posts-loader] 6 fallback(s), 0 skipped post(s). See _build-report.json.
+14:59:39 [content] Synced content
+14:59:39 [types] Generated 666ms
+14:59:39 [build] output: "static"
+14:59:39 [build] mode: "static"
+14:59:39 [build] directory: /home/puppet-master/Projects/open.content.blogs/.fixture-build-1JS1mi/dist/
+14:59:39 [build] Collecting build info...
+14:59:39 [build] ✓ Completed in 693ms.
+14:59:39 [build] Building static entrypoints...
+14:59:39 [vite] ✓ built in 224ms
+14:59:39 [vite] ✓ built in 48ms
+14:59:39 [build] Rearranging server assets...
+
+ generating static routes
+14:59:39   ├─ /404.html (+16ms)
+14:59:39   ├─ /posts/empty-file/index.html (+6ms)
+14:59:39   ├─ /posts/no-frontmatter/index.html (+3ms)
+14:59:39   ├─ /posts/malformed-date/index.html (+2ms)
+14:59:39   ├─ /posts/long-form/index.html (+2ms)
+14:59:39   ├─ /posts/tagged-post/index.html (+2ms)
+14:59:39   ├─ /posts/cafe-notes/index.html (+2ms)
+14:59:39   ├─ /posts/missing-title/index.html (+2ms)
+14:59:39   ├─ /rss.xml (+33ms)
+14:59:39   ├─ /tags/guides/index.html (+2ms)
+14:59:39   ├─ /tags/news/index.html (+2ms)
+14:59:39   ├─ /index.html (+3ms)
+14:59:39 ✓ Completed in 114ms.
+
+14:59:39 [build] ✓ Completed in 436ms.
+14:59:39 [@astrojs/sitemap] `sitemap-index.xml` created at `../../dist`
+14:59:39 [build] 11 page(s) built in 1.14s
+14:59:39 [build] Complete!
+Fixture build passed: external config and output, clean web/, 7 published posts, RSS, and dynamic sitemap routes.
+{
+  "loaded": 8,
+  "fallbacks": [
+    {
+      "file": "empty-file.md",
+      "field": "title",
+      "reason": "Missing or invalid title",
+      "value": "empty-file"
+    },
+    {
+      "file": "empty-file.md",
+      "field": "date",
+      "reason": "Missing or unparseable date",
+      "value": "2026-09-23T05:04:59.016Z"
+    },
+    {
+      "file": "malformed-date.md",
+      "field": "date",
+      "reason": "Missing or unparseable date",
+      "value": "2026-09-23T05:04:51.244Z"
+    },
+    {
+      "file": "missing-title.md",
+      "field": "title",
+      "reason": "Missing or invalid title",
+      "value": "missing-title"
+    },
+    {
+      "file": "no-frontmatter.md",
+      "field": "title",
+      "reason": "Missing or invalid title",
+      "value": "no-frontmatter"
+    },
+    {
+      "file": "no-frontmatter.md",
+      "field": "date",
+      "reason": "Missing or unparseable date",
+      "value": "2026-09-23T05:04:51.322Z"
+    }
+  ],
+  "skipped": []
+}

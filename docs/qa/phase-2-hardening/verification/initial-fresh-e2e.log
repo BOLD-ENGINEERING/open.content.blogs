@@ -1,0 +1,85 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0 -- /tmp/ocb-hardening-fresh/worker/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /tmp/ocb-hardening-fresh/worker
+configfile: pyproject.toml
+testpaths: tests
+collecting ... collected 88 items / 70 deselected / 18 selected
+
+tests/e2e/test_pipeline.py::test_s1_happy PASSED                         [  5%]
+tests/e2e/test_pipeline.py::test_s2_promotion PASSED                     [ 11%]
+tests/e2e/test_pipeline.py::test_s3_edges PASSED                         [ 16%]
+tests/e2e/test_pipeline.py::test_s4_hostile PASSED                       [ 22%]
+tests/e2e/test_pipeline.py::test_s4b_oversize PASSED                     [ 27%]
+tests/e2e/test_pipeline.py::test_s5_subdir PASSED                        [ 33%]
+tests/e2e/test_pipeline.py::test_s6_removal PASSED                       [ 38%]
+tests/e2e/test_pipeline.py::test_s7_dates PASSED                         [ 44%]
+tests/e2e/test_pipeline.py::test_s8_refs PASSED                          [ 50%]
+tests/e2e/test_pipeline.py::test_s9_rollback[0] PASSED                   [ 55%]
+tests/e2e/test_pipeline.py::test_s9_rollback[1] PASSED                   [ 61%]
+tests/e2e/test_pipeline.py::test_s10_concurrency FAILED                  [ 66%]
+tests/e2e/test_pipeline.py::test_s11_timeout PASSED                      [ 72%]
+tests/e2e/test_pipeline.py::test_s12_determinism PASSED                  [ 77%]
+tests/e2e/test_visual.py::test_visual[1440-900-light] PASSED             [ 83%]
+tests/e2e/test_visual.py::test_visual[1440-900-dark] PASSED              [ 88%]
+tests/e2e/test_visual.py::test_visual[390-844-light] PASSED              [ 94%]
+tests/e2e/test_visual.py::test_visual[390-844-dark] PASSED               [100%]
+
+=================================== FAILURES ===================================
+_____________________________ test_s10_concurrency _____________________________
+
+harness = <conftest.Harness object at 0x7e9d3a89e7b0>
+browser = <Browser type=<BrowserType name=chromium executable_path=/home/puppet-master/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome> version=153.0.8010.52>
+
+    def test_s10_concurrency(harness, browser):
+        repos = [harness.repo(f"concurrent-{n}") for n in range(3)]
+        for n, repo in enumerate(repos):
+            repo.write(f"only-{n}.md", post(n))
+            repo.commit()
+        singles = []
+        for n, repo in enumerate(repos):
+            started = time.monotonic()
+            harness.build(repo, f"single-{n}")
+            singles.append(time.monotonic() - started)
+        before = snapshot(ROOT / "web")
+        started = time.monotonic()
+        with ThreadPoolExecutor(max_workers=3) as pool:
+            futures = [
+                pool.submit(harness.build, repo, f"concurrent-{n}") for n, repo in enumerate(repos)
+            ]
+            results = [future.result() for future in futures]
+        wall = time.monotonic() - started
+        after = snapshot(ROOT / "web")
+        changes = {
+            path: [before.get(path), after.get(path)]
+            for path in before.keys() | after.keys()
+            if before.get(path) != after.get(path)
+        }
+        (harness.root / "web-snapshot-diff.json").write_text(
+            json.dumps({"entries": len(before), "changes": changes}, indent=2)
+        )
+        assert not changes, changes
+        intervals = [next(row for row in data["stages"] if row["name"] == "build") for data in results]
+        (harness.root / "concurrency.json").write_text(
+            json.dumps(
+                {
+                    "singles": singles,
+                    "median": statistics.median(singles),
+                    "wall": wall,
+                    "intervals": intervals,
+                },
+                indent=2,
+            )
+        )
+        assert max(datetime.fromisoformat(row["started_at"]) for row in intervals) < min(
+            datetime.fromisoformat(row["ended_at"]) for row in intervals
+        )
+>       assert wall < 2 * statistics.median(singles)
+E       assert 4.659344262996456 < (2 * 2.2991472219873685)
+E        +  where 2.2991472219873685 = <function median at 0x7e9d3a82dc70>([2.4137516120099463, 2.2991472219873685, 2.090121896995697])
+E        +    where <function median at 0x7e9d3a82dc70> = statistics.median
+
+tests/e2e/test_pipeline.py:361: AssertionError
+=========================== short test summary info ============================
+FAILED tests/e2e/test_pipeline.py::test_s10_concurrency - assert 4.6593442629...
+=========== 1 failed, 17 passed, 70 deselected in 319.48s (0:05:19) ============

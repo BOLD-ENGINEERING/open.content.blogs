@@ -1,0 +1,9 @@
+/home/puppet-master/Projects/open.content.blogs: git status --porcelain web/ -> empty
+/tmp/ocb-hardening-fresh-final: git status --porcelain web/ -> empty
+Live task-owned Node/pnpm/Chromium/local-worker-server processes: 0
+Existing Phase 2 screenshots: unchanged; new report images: 0
+ocb-hardening-final-1: snapshot unchanged (17304 entries), concurrency wall 3.659089 < 5.329283
+ocb-hardening-final-2: snapshot unchanged (17304 entries), concurrency wall 4.123271 < 5.614879
+ocb-hardening-fresh-final-e2e: snapshot unchanged (17266 entries), concurrency wall 3.500369 < 4.709526
+Source verification commit: 6e0e3732321f32129814d2b28267117521a22593
+Origin transport: SSH github.com; no external service contacted or remote push attempted

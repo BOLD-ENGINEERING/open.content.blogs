@@ -1,0 +1,9 @@
+$ astro check
+15:13:12 [content] Syncing content
+15:13:12 [content] Synced content
+15:13:12 [types] Generated 532ms
+15:13:12 [check] Getting diagnostics for Astro files in /tmp/ocb-hardening-fresh-final/web...
+Result (19 files):
+- 0 errors
+- 0 warnings
+- 0 hints

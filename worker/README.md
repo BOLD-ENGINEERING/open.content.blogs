@@ -251,7 +251,7 @@ fetch manifest and error-log path. Unreached stages are absent.
 
 User validation/fetch errors and build/deploy failures become results. Worker
 misconfiguration (including `BuildConfigurationError`, target configuration, and
-filesystem infrastructure failures) still raises; exceptions from the event
-consumer also propagate. Callbacks should be quick and reliable. Job IDs must be
+filesystem infrastructure failures) still raises. Callbacks should not raise;
+reliable, fast progress handling is the caller's responsibility. Job IDs must be
 unique. Authentication, durable scheduling, retries, cancellation, ownership and
 branch-collision policy remain API responsibilities.

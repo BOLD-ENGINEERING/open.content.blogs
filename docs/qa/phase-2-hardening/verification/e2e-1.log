@@ -1,0 +1,28 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0 -- /home/puppet-master/Projects/open.content.blogs/worker/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/puppet-master/Projects/open.content.blogs/worker
+configfile: pyproject.toml
+testpaths: tests
+collecting ... collected 88 items / 70 deselected / 18 selected
+
+tests/e2e/test_pipeline.py::test_s1_happy PASSED                         [  5%]
+tests/e2e/test_pipeline.py::test_s2_promotion PASSED                     [ 11%]
+tests/e2e/test_pipeline.py::test_s3_edges PASSED                         [ 16%]
+tests/e2e/test_pipeline.py::test_s4_hostile PASSED                       [ 22%]
+tests/e2e/test_pipeline.py::test_s4b_oversize PASSED                     [ 27%]
+tests/e2e/test_pipeline.py::test_s5_subdir PASSED                        [ 33%]
+tests/e2e/test_pipeline.py::test_s6_removal PASSED                       [ 38%]
+tests/e2e/test_pipeline.py::test_s7_dates PASSED                         [ 44%]
+tests/e2e/test_pipeline.py::test_s8_refs PASSED                          [ 50%]
+tests/e2e/test_pipeline.py::test_s9_rollback[0] PASSED                   [ 55%]
+tests/e2e/test_pipeline.py::test_s9_rollback[1] PASSED                   [ 61%]
+tests/e2e/test_pipeline.py::test_s10_concurrency PASSED                  [ 66%]
+tests/e2e/test_pipeline.py::test_s11_timeout PASSED                      [ 72%]
+tests/e2e/test_pipeline.py::test_s12_determinism PASSED                  [ 77%]
+tests/e2e/test_visual.py::test_visual[1440-900-light] PASSED             [ 83%]
+tests/e2e/test_visual.py::test_visual[1440-900-dark] PASSED              [ 88%]
+tests/e2e/test_visual.py::test_visual[390-844-light] PASSED              [ 94%]
+tests/e2e/test_visual.py::test_visual[390-844-dark] PASSED               [100%]
+
+================ 18 passed, 70 deselected in 296.22s (0:04:56) =================
