@@ -51,6 +51,7 @@ def test_build_contract(setup_build, monkeypatch, code, report, status):
     args, options = calls[0]
     assert args == ["pnpm", "build"] and options["cwd"] == template
     assert options["start_new_session"] and not options.get("shell", False)
+    assert options["env"]["RAYON_NUM_THREADS"] == "2"
     assert options["env"]["BUILD_CACHE_DIR"] == str(content.parent / ".astro")
     assert options["env"]["CONTENT_DIR"] == str(content)
     assert options["env"]["SITE_URL"] == "http://test.localhost:8787"

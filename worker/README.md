@@ -113,7 +113,10 @@ forces this path for tests. `doctor` prints the detected/forced activation mode.
 The worker supplies `CONTENT_DIR`, `BLOG_CONFIG`, `BUILD_OUT_DIR`,
 `BUILD_CACHE_DIR=BUILD_ROOT/<build_id>/.astro`, and `SITE_URL` to Astro. Their
 standalone defaults and relative-path behavior are in AGENTS.md. Builds use a
-minimal PATH and private HOME. Only dependency installation holds the shared
+minimal PATH and private HOME. The installed Rolldown/Rayon native pool is capped
+at two threads per build (`RAYON_NUM_THREADS=2`) to limit contention between
+concurrent processes; this also applies to single-build baselines. Only dependency
+installation holds the shared
 lock under `/tmp/ocb-template-locks`; compilation runs concurrently.
 
 Astro 7.2.10's `cacheDir` does not relocate generated types under `root/.astro`

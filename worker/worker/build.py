@@ -51,6 +51,7 @@ def _base_env(home: Path) -> dict[str, str]:
         "HOME": str(home),
         "CI": "true",
         "ASTRO_TELEMETRY_DISABLED": "1",
+        "RAYON_NUM_THREADS": "2",
     }
 
 
