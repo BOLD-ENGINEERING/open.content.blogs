@@ -3,7 +3,6 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 import pytest
-from conftest import ROOT
 from test_pipeline import audit
 
 pytestmark = pytest.mark.e2e
@@ -23,7 +22,7 @@ def test_visual(harness, happy, edges, empty, browser, width, height, theme):
         ("s8", "empty", empty[1]["site_url"], "/"),
         ("serve", "listing", f"http://localhost:{harness.port}", "/"),
     ]
-    output = ROOT / "docs/qa/phase-2/screenshots"
+    output = harness.root / "screenshots"
     output.mkdir(parents=True, exist_ok=True)
     metrics = []
     for scenario, name, origin, path in pages:
@@ -58,10 +57,25 @@ def test_visual(harness, happy, edges, empty, browser, width, height, theme):
             ]:
                 assert page.locator(selector).get_attribute(attribute)
             assert page.evaluate("document.documentElement.scrollWidth") <= width
+            if name != "listing":
+                boxes = [
+                    page.locator(selector).bounding_box()
+                    for selector in (".site-header", ".site-main", ".site-footer")
+                ]
+                assert all(
+                    abs(box["x"] - boxes[0]["x"]) < 1 and abs(box["width"] - boxes[0]["width"]) < 1
+                    for box in boxes
+                )
+                assert boxes[0]["width"] <= 720
+                column = page.locator(
+                    ".post-article, .post-list, .empty-state, .page-heading"
+                ).first.bounding_box()
+                assert abs(column["x"] - boxes[0]["x"]) < 1
+
             size = page.evaluate(
                 "performance.getEntriesByType('navigation').concat(performance.getEntriesByType('resource')).reduce((sum, item) => sum + item.transferSize, 0)"
             )
-            assert 0 < size < 200 * 1024, (name, size)
+            assert 0 < size < 100_000, (name, size)
             toggle = page.locator(".theme-toggle")
             for _ in range(30):
                 page.keyboard.press("Tab")

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -218,3 +219,21 @@ def browser(harness):
         )
         yield browser
         browser.close()
+
+
+def snapshot(root):
+    result = {}
+    for path in [root, *root.rglob("*")]:
+        info = path.lstat()
+        digest = (
+            hashlib.sha256(path.read_bytes()).hexdigest()
+            if path.is_file() and not path.is_symlink()
+            else None
+        )
+        result[str(path.relative_to(root))] = [
+            info.st_size,
+            info.st_mtime_ns,
+            digest,
+            os.readlink(path) if path.is_symlink() else None,
+        ]
+    return result

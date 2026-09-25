@@ -3,14 +3,17 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import statistics
+import time
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from html import unescape
 from pathlib import Path
 from urllib.parse import urlsplit
 from xml.etree import ElementTree
 
 import pytest
-from conftest import ROOT, command, post
+from conftest import ROOT, command, post, snapshot
 
 pytestmark = pytest.mark.e2e
 
@@ -261,7 +264,12 @@ def test_s8_refs(harness, empty, browser):
     before = set(harness.build_root.iterdir())
     failed = harness.build(repo, "bad-ref", "does-not-exist", success=False)
     assert "does-not-exist" in failed["build"]["error"]
-    assert set(harness.build_root.iterdir()) == before
+    retained = set(harness.build_root.iterdir()) - before
+    assert len(retained) == 1
+    assert all(
+        (path / ".finished").is_file() and (path / "pipeline.log").is_file() for path in retained
+    )
+    assert all(not (path / "src").exists() for path in retained)
     result = harness.cli(
         "build",
         "--repo",
@@ -271,13 +279,26 @@ def test_s8_refs(harness, empty, browser):
         "--json",
     )
     assert result.returncode == 1 and json.loads(result.stdout)["build"]["status"] == "failed"
-    assert "Traceback" not in result.stderr and set(harness.build_root.iterdir()) == before
+    assert "Traceback" not in result.stderr
+    retained = set(harness.build_root.iterdir()) - before
+    assert len(retained) == 2
+    assert all(
+        (path / ".finished").is_file() and (path / "pipeline.log").is_file() for path in retained
+    )
+    assert all(not (path / "src").exists() for path in retained)
+    parents = {harness.build_root.parent, harness.serve_root.parent}
+    snapshots = {path: snapshot(path) for path in parents}
+    invalid = harness.cli("build", "--repo", repo.bare.as_uri(), "--slug", "../escape", "--json")
+    assert invalid.returncode == 1 and "slug" in invalid.stderr
+    assert {path: snapshot(path) for path in parents} == snapshots
     assert "No posts published yet." in harness.get(empty_data["site_url"])[1]
     audit(browser, harness, data)
     audit(browser, harness, empty_data)
 
 
-def test_s9_rollback(harness, browser):
+@pytest.mark.parametrize("activation", ["0", "1"])
+def test_s9_rollback(harness, browser, activation, monkeypatch):
+    monkeypatch.setitem(harness.env, "OCB_FORCE_RENAME_FALLBACK", activation)
     repo = harness.repo("rollback")
     repo.write("a.md", post(1))
     sha = repo.commit()
@@ -295,15 +316,50 @@ def test_s9_rollback(harness, browser):
 
 
 def test_s10_concurrency(harness, browser):
-    repos = [harness.repo(f"concurrent-{n}") for n in range(2)]
+    repos = [harness.repo(f"concurrent-{n}") for n in range(3)]
     for n, repo in enumerate(repos):
         repo.write(f"only-{n}.md", post(n))
         repo.commit()
-    with ThreadPoolExecutor(max_workers=2) as pool:
+    singles = []
+    for n, repo in enumerate(repos):
+        started = time.monotonic()
+        harness.build(repo, f"single-{n}")
+        singles.append(time.monotonic() - started)
+    before = snapshot(ROOT / "web")
+    started = time.monotonic()
+    with ThreadPoolExecutor(max_workers=3) as pool:
         futures = [
             pool.submit(harness.build, repo, f"concurrent-{n}") for n, repo in enumerate(repos)
         ]
         results = [future.result() for future in futures]
+    wall = time.monotonic() - started
+    after = snapshot(ROOT / "web")
+    changes = {
+        path: [before.get(path), after.get(path)]
+        for path in before.keys() | after.keys()
+        if before.get(path) != after.get(path)
+    }
+    (harness.root / "web-snapshot-diff.json").write_text(
+        json.dumps({"entries": len(before), "changes": changes}, indent=2)
+    )
+    assert not changes, changes
+    intervals = [next(row for row in data["stages"] if row["name"] == "build") for data in results]
+    (harness.root / "concurrency.json").write_text(
+        json.dumps(
+            {
+                "singles": singles,
+                "median": statistics.median(singles),
+                "wall": wall,
+                "intervals": intervals,
+            },
+            indent=2,
+        )
+    )
+    assert max(datetime.fromisoformat(row["started_at"]) for row in intervals) < min(
+        datetime.fromisoformat(row["ended_at"]) for row in intervals
+    )
+    assert wall < 2 * statistics.median(singles)
+    assert len({data["build"]["dist_dir"] for data in results}) == 3
     for n, data in enumerate(results):
         assert published(harness, data) == {f"/posts/only-{n}/"}
         audit(browser, harness, data)

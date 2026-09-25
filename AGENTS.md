@@ -117,6 +117,7 @@ Run Astro commands from `web/`. Relative paths below resolve from `web/`; absolu
 
 - `CONTENT_DIR`: Markdown source directory. Defaults to `src/content/posts`.
 - `BLOG_CONFIG`: Site config JSON path. Defaults to `./blog.config.json`.
+- `BUILD_CACHE_DIR`: Per-build Astro cache directory. Defaults to `./.astro`. Worker sets `BUILD_ROOT/<build_id>/.astro`; Vite cache and a disposable template workspace live inside it.
 - `BUILD_OUT_DIR`: Static output directory. Defaults to `./dist`; `_build-report.json` is written inside it.
 - `SITE_URL`: Astro `site` URL. Defaults to `baseUrl` in the loaded `BLOG_CONFIG` file.
 
@@ -144,12 +145,13 @@ Run Astro commands from `web/`. Relative paths below resolve from `web/`; absolu
 ## Worker
 
 See `worker/README.md` for setup, commands, env vars, contracts and fresh-clone
-verification. Run Python commands from `worker/` using its `.venv`. Runtime needs
-Linux/glibc atomic directory exchange. Unit tests need neither Node nor network.
+verification. Run Python commands from `worker/` using its `.venv`. Production uses Linux/glibc atomic directory exchange; other hosts use a
+rename fallback with a brief live-directory gap. Unit tests need neither Node nor network.
 E2E tests use local bare repositories, local HTTP and headless Chromium; all
 Cloudflare calls are mocked. Never deploy Cloudflare during local verification.
 Each E2E run needs fresh BUILD_ROOT/SERVE_ROOT (the harness creates them by default).
-Screenshots are committed under `docs/qa/phase-2/screenshots/`. Keep user content
+Visual captures stay in each test run root and are not review deliverables. Keep user content
 plain Markdown, preserve sanitization limits, and retain full process-group timeout
-cleanup. Builds serialize access to the shared Astro template using an external
-lock; the tracked web tree must remain clean.
+cleanup. Builds use private Astro/Vite workspaces and run concurrently. Only dependency
+installation keeps the shared template lock; all of web/, including node_modules,
+must remain unchanged during worker builds.
