@@ -107,7 +107,9 @@ class CloudflareTarget:
                 timeout=DEPLOY_TIMEOUT,
             )
         except (OSError, subprocess.TimeoutExpired) as error:
-            log_path.write_text(f"Wrangler project setup failed: {error}\n", encoding="utf8")
+            log_path.write_text(
+                f"Wrangler project setup failed: {self._safe_output(str(error))}\n", encoding="utf8"
+            )
             return DeployResult(
                 status="failed",
                 deployment_url=None,

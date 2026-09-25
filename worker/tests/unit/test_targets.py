@@ -147,3 +147,18 @@ def test_local_copy_failure_preserves_current(tmp_path, monkeypatch):
     monkeypatch.setattr("worker.targets.local.shutil.copytree", fail)
     assert target.deploy(str(dist), "blog", "main", "b" * 40).status == "failed"
     assert (tmp_path / "serve/blog/main/index.html").read_text() == "A"
+
+
+@pytest.mark.parametrize("stage", ["project", "deploy"])
+def test_cloud_exception_redacts_credentials(cloud, tmp_path, monkeypatch, stage):
+    def run(args, **kwargs):
+        if "create" in args and stage == "deploy":
+            return subprocess.CompletedProcess(args, 0, "created", "")
+        raise OSError("failure secret-token secret-account")
+
+    monkeypatch.setattr(cloudflare.subprocess, "run", run)
+    result = cloud.deploy(str(tmp_path / "dist"), "blog", "main", "a" * 40)
+    assert result.status == "failed"
+    for output in (result.error, Path(result.log_path).read_text()):
+        assert "secret-token" not in output and "secret-account" not in output
+        assert "[REDACTED]" in output
