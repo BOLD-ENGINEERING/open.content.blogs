@@ -235,8 +235,15 @@ export function postsLoader(): Loader {
               ...sanitizeHtml.defaults.allowedAttributes,
               "*": ["id", "class"],
               img: ["src", "alt", "title", "width", "height"],
+              pre: ["tabindex"],
             },
             allowedSchemes: ["http", "https", "mailto"],
+            transformTags: {
+              pre: (tagName, attribs) => ({
+                tagName,
+                attribs: { ...attribs, tabindex: "0" },
+              }),
+            },
           });
 
           store.set({
