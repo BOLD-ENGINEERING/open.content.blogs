@@ -3,9 +3,9 @@
 ## Repository Overview
 
 Monorepo containing a developer-first blogging platform with:
-- `web/` - Astro 6 frontend (TypeScript)
+- `web/` - Astro 7 frontend (TypeScript)
 - `api/` - FastAPI backend (Python 3.14)
-- `worker/` - Background worker (placeholder)
+- `worker/` - Git-to-static-site worker, local serving and deployment targets
 
 ## Build Commands
 
@@ -31,14 +31,10 @@ Navigate to `api/` directory first.
 
 ### Testing
 
-**IMPORTANT**: This codebase has no test framework configured. Before adding tests:
-1. Check if a testing framework is needed
-2. If adding tests, ask user which framework (pytest, vitest, etc.)
-3. Configure test commands in package.json or pyproject.toml
-
-**Single test file pattern** (when tests are added):
-- Python: `pytest path/to/test_file.py -k test_name`
-- JavaScript: `pnpm test src/path/to/test.test.ts`
+Python tests use the existing pytest dev dependency in each project's own venv.
+Run `.venv/bin/pytest` from `api/` or `worker/`. Worker unit tests exclude the
+`e2e` marker by default. Run `.venv/bin/pytest -m e2e` from `worker/` for the full
+local Git/Astro/HTTP/Chromium pipeline. Do not weaken or skip failing assertions.
 
 ## Code Style Guidelines
 
@@ -97,8 +93,8 @@ Navigate to `api/` directory first.
 - **Node version**: >=22.12.0
 - **Workspace**: Root directory contains all sub-projects
 - **Virtual environments**: Uses `.venv/` for Python API
-- **No testing infrastructure**: Must be configured if needed
-- **No linting infrastructure**: Must be configured if needed
+- **Testing**: pytest in API and worker; worker E2E is opt-in.
+- **Linting**: Ruff in Python projects; Prettier and Astro check in web.
 
 ## Running Commands
 
@@ -144,3 +140,16 @@ Run Astro commands from `web/`. Relative paths below resolve from `web/`; absolu
 - `api/` and `worker/` are Python 3.14, each with its own venv.
 - Every change must pass: `pnpm check` (web), `ruff check` + `pytest` (api, worker).
 - Do not add a dependency without justifying it in your response.
+
+## Worker
+
+See `worker/README.md` for setup, commands, env vars, contracts and fresh-clone
+verification. Run Python commands from `worker/` using its `.venv`. Runtime needs
+Linux/glibc atomic directory exchange. Unit tests need neither Node nor network.
+E2E tests use local bare repositories, local HTTP and headless Chromium; all
+Cloudflare calls are mocked. Never deploy Cloudflare during local verification.
+Each E2E run needs fresh BUILD_ROOT/SERVE_ROOT (the harness creates them by default).
+Screenshots are committed under `docs/qa/phase-2/screenshots/`. Keep user content
+plain Markdown, preserve sanitization limits, and retain full process-group timeout
+cleanup. Builds serialize access to the shared Astro template using an external
+lock; the tracked web tree must remain clean.
