@@ -94,7 +94,13 @@ try {
 
   const home = await readFile(join(distRoot, "index.html"), "utf8");
   assert.ok(home.includes("Fixture Blog"));
-  assert.ok(home.includes('href="https://config.example/"'));
+  assert.ok(home.includes(`rel="canonical" href="${siteUrl}"`));
+  assert.ok(home.includes(`property="og:url" content="${siteUrl}"`));
+  const longHtml = await readFile(
+    join(distRoot, "posts", "long-form", "index.html"),
+    "utf8",
+  );
+  assert.match(longHtml, /<pre[^>]*tabindex="0"/);
 
   const feed = await readFile(join(distRoot, "rss.xml"), "utf8");
   assert.ok(feed.includes("Fixture Blog"));
