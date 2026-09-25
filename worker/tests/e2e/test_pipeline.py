@@ -84,6 +84,10 @@ def test_s1_happy(harness, happy, browser):
             f"/posts/post-{n:02d}/" for n in range(12) if n % 4 == tag
         }
     assert len(published(harness, data)) == 12
+    feed = ElementTree.fromstring(harness.get(origin, "/rss.xml")[1])
+    for item in feed.findall(".//item/link"):
+        assert item.text.startswith(origin + "/")
+        assert harness.get(item.text, urlsplit(item.text).path)[0] == 200
     seen = audit(browser, harness, data)
     sitemap = ElementTree.fromstring(harness.get(origin, "/sitemap-0.xml")[1])
     sitemap_urls = {element.text for element in sitemap.iter() if element.tag.endswith("}loc")}
